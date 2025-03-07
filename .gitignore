@@ -1,3 +1,5 @@
+*.pdf
+*.key
 .DS_Store
 
 # ---> Python
