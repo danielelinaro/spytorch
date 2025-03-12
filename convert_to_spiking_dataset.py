@@ -9,6 +9,8 @@ from scipy.sparse import coo_array
 import torchvision
 
 def poisson_spike_indexes(rate, tend, dt):
+    if rate == 0:
+        return np.array([])
     n_spikes = int(np.ceil(tend * rate))
     ISI = np.random.exponential(1/rate, n_spikes)
     spike_times = np.cumsum(ISI)
@@ -37,7 +39,7 @@ if __name__ == '__main__':
         print(f'usage: {progname} dataset-name')
         sys.exit(0)
 
-    dataset_name = sys.argv[0]
+    dataset_name = sys.argv[1]
     if dataset_name == 'mnist':
         dataset_fun = torchvision.datasets.MNIST
     elif dataset_name == 'fashion-mnist':
@@ -52,14 +54,14 @@ if __name__ == '__main__':
     rows,cols = training_set.data.shape[1:]
     print('The examples are {}-by-{} pixels.'.format(rows, cols))
 
-    X_train = (training_set.data / 255.).reshape(len(training_set), -1)
-    labels_train = training_set.targets
-    X_test = (test_set.data / 255.).reshape(len(test_set), -1)
-    labels_test  = test_set.targets
+    X_train = (training_set.data.numpy() / 255.).reshape(len(training_set), -1)
+    labels_train = training_set.targets.numpy()
+    X_test = (test_set.data.numpy() / 255.).reshape(len(test_set), -1)
+    labels_test  = test_set.targets.numpy()
 
     tend = 0.2
     dt = 1e-3
-    max_firing_rate = 10
+    max_firing_rate = 10.
 
     for X, labels, suffix in zip((X_train,X_test), (labels_train,labels_test), ('train','test')):
         print(f'Building {suffix} set...')
